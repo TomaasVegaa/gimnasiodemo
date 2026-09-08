@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Users, ShoppingBag, Fingerprint, ShoppingCart, UserCheck, Wallet } from 'lucide-react';
+import { LayoutDashboard, Users, ShoppingBag, Fingerprint, ShoppingCart, UserCheck, Wallet, ClipboardList } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface SidebarProps {
@@ -13,6 +13,7 @@ const navItems: { id: string; label: string; icon: any; countKey?: string }[] = 
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'cashregister', label: 'Caja', icon: Wallet },
   { id: 'members', label: 'Socios', icon: Users, countKey: 'expiring' },
+  { id: 'plans', label: 'Planes', icon: ClipboardList },
   { id: 'inventory', label: 'Inventario', icon: ShoppingBag },
   { id: 'access', label: 'Control de Acceso', icon: Fingerprint },
 ];

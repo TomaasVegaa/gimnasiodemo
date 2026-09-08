@@ -5,10 +5,13 @@ import { MembersList } from './components/MembersList';
 import { Inventory } from './components/Inventory';
 import { AccessControl } from './components/AccessControl';
 import { CashRegister } from './components/CashRegister';
+import { PlansManagement } from './components/PlansManagement';
 import { PosModal } from './components/PosModal';
 import { NewMemberModal } from './components/NewMemberModal';
 import { WhatsappNotificationModal } from './components/WhatsappNotificationModal';
 import { MemberDetailDrawer } from './components/MemberDetailDrawer';
+import { ProductModal } from './components/ProductModal';
+import { PlanModal } from './components/PlanModal';
 import { mockMembers, mockProducts, mockPlans, mockTransactions } from './data/mockData';
 import { Member, Product, Plan, Transaction, PaymentMethod } from './types';
 import { addDays, format } from 'date-fns';
@@ -19,7 +22,7 @@ export default function App() {
   // Reactive State
   const [members, setMembers] = useState<Member[]>(mockMembers);
   const [products, setProducts] = useState<Product[]>(mockProducts);
-  const [plans] = useState<Plan[]>(mockPlans);
+  const [plans, setPlans] = useState<Plan[]>(mockPlans);
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
 
   // Modals & Drawers State
@@ -27,6 +30,12 @@ export default function App() {
   const [isNewMemberOpen, setIsNewMemberOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [whatsappMember, setWhatsappMember] = useState<Member | null>(null);
+  
+  // CRUD Modals State
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | undefined>();
+  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<Plan | undefined>();
 
   const registerTransaction = (tx: Omit<Transaction, 'id' | 'timestamp'>) => {
     const newTx: Transaction = {
@@ -116,6 +125,35 @@ export default function App() {
 
   const expiringCount = members.filter(m => m.status === 'EXPIRING_SOON').length;
 
+  // CRUD Handlers
+  const handleSaveProduct = (productData: Omit<Product, 'id'>, id?: string) => {
+    if (id) {
+      setProducts(prev => prev.map(p => p.id === id ? { ...productData, id } : p));
+    } else {
+      setProducts(prev => [...prev, { ...productData, id: `P-${Date.now()}` }]);
+    }
+  };
+
+  const handleDeleteProduct = (id: string) => {
+    if (confirm('¿Eliminar producto?')) {
+      setProducts(prev => prev.filter(p => p.id !== id));
+    }
+  };
+
+  const handleSavePlan = (planData: Omit<Plan, 'id'>, id?: string) => {
+    if (id) {
+      setPlans(prev => prev.map(p => p.id === id ? { ...planData, id } : p));
+    } else {
+      setPlans(prev => [...prev, { ...planData, id: `PLAN-${Date.now()}` }]);
+    }
+  };
+
+  const handleDeletePlan = (id: string) => {
+    if (confirm('¿Eliminar plan?')) {
+      setPlans(prev => prev.filter(p => p.id !== id));
+    }
+  };
+
   // Calculate daily sales for dashboard
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const dailySalesIncome = transactions
@@ -152,10 +190,21 @@ export default function App() {
             onOpenNewMember={() => setIsNewMemberOpen(true)}
           />
         )}
+        {activeTab === 'plans' && (
+          <PlansManagement 
+            plans={plans}
+            onAddPlan={() => { setEditingPlan(undefined); setIsPlanModalOpen(true); }}
+            onEditPlan={(p) => { setEditingPlan(p); setIsPlanModalOpen(true); }}
+            onDeletePlan={handleDeletePlan}
+          />
+        )}
         {activeTab === 'inventory' && (
           <Inventory 
             products={products}
             onOpenPos={() => setIsPosOpen(true)}
+            onAddProduct={() => { setEditingProduct(undefined); setIsProductModalOpen(true); }}
+            onEditProduct={(p) => { setEditingProduct(p); setIsProductModalOpen(true); }}
+            onDeleteProduct={handleDeleteProduct}
           />
         )}
         {activeTab === 'access' && <AccessControl />}
@@ -166,6 +215,8 @@ export default function App() {
       <NewMemberModal isOpen={isNewMemberOpen} onClose={() => setIsNewMemberOpen(false)} plans={plans} onCreateMember={handleCreateMember} />
       <WhatsappNotificationModal member={whatsappMember} isOpen={!!whatsappMember} onClose={() => setWhatsappMember(null)} onNotificationSent={() => {}} />
       <MemberDetailDrawer member={selectedMember} plans={plans} isOpen={!!selectedMember} onClose={() => setSelectedMember(null)} onRenewMembership={handleRenewMembership} onOpenWhatsapp={(m) => setWhatsappMember(m)} />
+      <ProductModal isOpen={isProductModalOpen} onClose={() => setIsProductModalOpen(false)} onSave={handleSaveProduct} product={editingProduct} />
+      <PlanModal isOpen={isPlanModalOpen} onClose={() => setIsPlanModalOpen(false)} onSave={handleSavePlan} plan={editingPlan} />
 
     </div>
   );

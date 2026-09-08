@@ -1,13 +1,16 @@
 import React from 'react';
 import { Product } from '../types';
-import { Package, Plus, ShoppingCart } from 'lucide-react';
+import { Package, Plus, ShoppingCart, Edit2, Trash2 } from 'lucide-react';
 
 interface InventoryProps {
   products: Product[];
   onOpenPos: () => void;
+  onAddProduct: () => void;
+  onEditProduct: (product: Product) => void;
+  onDeleteProduct: (id: string) => void;
 }
 
-export function Inventory({ products, onOpenPos }: InventoryProps) {
+export function Inventory({ products, onOpenPos, onAddProduct, onEditProduct, onDeleteProduct }: InventoryProps) {
   return (
     <div className="p-8 max-w-7xl mx-auto animate-in fade-in duration-500">
       <header className="mb-8 flex justify-between items-end">
@@ -16,6 +19,13 @@ export function Inventory({ products, onOpenPos }: InventoryProps) {
           <p className="text-slate-500 mt-1">Control de stock de bebidas, suplementos y cobro en mostrador.</p>
         </div>
         <div className="flex gap-3">
+          <button 
+            onClick={onAddProduct}
+            className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-800 transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            Nuevo Producto
+          </button>
           <button 
             onClick={onOpenPos}
             className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-500 transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
@@ -30,12 +40,22 @@ export function Inventory({ products, onOpenPos }: InventoryProps) {
         {products.map((product) => (
           <div key={product.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
             <div className="flex justify-between items-start mb-4">
-              <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
-                <Package className="w-6 h-6" />
+              <div className="flex gap-3 items-center">
+                <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                  <Package className="w-6 h-6" />
+                </div>
+                <span className="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full">
+                  {product.category}
+                </span>
               </div>
-              <span className="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full">
-                {product.category}
-              </span>
+              <div className="flex gap-1">
+                <button onClick={() => onEditProduct(product)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer">
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button onClick={() => onDeleteProduct(product.id)} className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
             <h3 className="text-lg font-semibold text-slate-900">{product.name}</h3>
             <div className="mt-4 flex items-center justify-between">
