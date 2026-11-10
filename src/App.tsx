@@ -6,14 +6,18 @@ import { Inventory } from './components/Inventory';
 import { AccessControl } from './components/AccessControl';
 import { CashRegister } from './components/CashRegister';
 import { PlansManagement } from './components/PlansManagement';
+import { RoutinesManagement } from './components/RoutinesManagement';
+import { MemberPortal } from './components/MemberPortal';
 import { PosModal } from './components/PosModal';
 import { NewMemberModal } from './components/NewMemberModal';
 import { WhatsappNotificationModal } from './components/WhatsappNotificationModal';
 import { MemberDetailDrawer } from './components/MemberDetailDrawer';
 import { ProductModal } from './components/ProductModal';
 import { PlanModal } from './components/PlanModal';
-import { mockMembers, mockProducts, mockPlans, mockTransactions } from './data/mockData';
-import { Member, Product, Plan, Transaction, PaymentMethod } from './types';
+import { RoutineModal } from './components/RoutineModal';
+import { ExerciseStudioModal } from './components/ExerciseStudioModal';
+import { mockMembers, mockProducts, mockPlans, mockTransactions, mockRoutines, mockExerciseCatalog } from './data/mockData';
+import { Member, Product, Plan, Transaction, PaymentMethod, Routine, CatalogExercise } from './types';
 import { addDays, format } from 'date-fns';
 
 export default function App() {
@@ -23,6 +27,8 @@ export default function App() {
   const [members, setMembers] = useState<Member[]>(mockMembers);
   const [products, setProducts] = useState<Product[]>(mockProducts);
   const [plans, setPlans] = useState<Plan[]>(mockPlans);
+  const [routines, setRoutines] = useState<Routine[]>(mockRoutines);
+  const [exerciseCatalog, setExerciseCatalog] = useState<CatalogExercise[]>(mockExerciseCatalog);
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
 
   // Modals & Drawers State
@@ -36,6 +42,10 @@ export default function App() {
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<Plan | undefined>();
+  const [isRoutineModalOpen, setIsRoutineModalOpen] = useState(false);
+  const [editingRoutine, setEditingRoutine] = useState<Routine | undefined>();
+  const [isExerciseStudioOpen, setIsExerciseStudioOpen] = useState(false);
+  const [editingCatalogExercise, setEditingCatalogExercise] = useState<CatalogExercise | undefined>();
 
   const registerTransaction = (tx: Omit<Transaction, 'id' | 'timestamp'>) => {
     const newTx: Transaction = {
@@ -95,7 +105,7 @@ export default function App() {
     }));
   };
 
-  const handleCreateMember = (name: string, email: string, phone: string, planId: string, paymentMethod: PaymentMethod) => {
+  const handleCreateMember = (name: string, email: string, phone: string, planId: string, paymentMethod: PaymentMethod, fingerprintId?: string) => {
     const selectedPlan = plans.find(p => p.id === planId);
     if (!selectedPlan) return;
 
@@ -110,7 +120,9 @@ export default function App() {
       totalAttendances: 0,
       planId: selectedPlan.id,
       planName: selectedPlan.name,
+      assignedRoutineId: routines[0]?.id,
       attendancesHistory: [],
+      fingerprintId,
     };
 
     setMembers(prev => [newMember, ...prev]);
@@ -121,6 +133,21 @@ export default function App() {
       amount: selectedPlan.price,
       paymentMethod,
     });
+  };
+
+  const handleAssignRoutine = (memberId: string, routineId: string) => {
+    setMembers(prev =>
+      prev.map(m => {
+        if (m.id === memberId) {
+          const updated = { ...m, assignedRoutineId: routineId || undefined };
+          if (selectedMember?.id === memberId) {
+            setSelectedMember(updated);
+          }
+          return updated;
+        }
+        return m;
+      })
+    );
   };
 
   const expiringCount = members.filter(m => m.status === 'EXPIRING_SOON').length;
@@ -135,9 +162,7 @@ export default function App() {
   };
 
   const handleDeleteProduct = (id: string) => {
-    if (confirm('¿Eliminar producto?')) {
-      setProducts(prev => prev.filter(p => p.id !== id));
-    }
+    setProducts(prev => prev.filter(p => p.id !== id));
   };
 
   const handleSavePlan = (planData: Omit<Plan, 'id'>, id?: string) => {
@@ -149,9 +174,31 @@ export default function App() {
   };
 
   const handleDeletePlan = (id: string) => {
-    if (confirm('¿Eliminar plan?')) {
-      setPlans(prev => prev.filter(p => p.id !== id));
+    setPlans(prev => prev.filter(p => p.id !== id));
+  };
+
+  const handleSaveRoutine = (routineData: Omit<Routine, 'id'>, id?: string) => {
+    if (id) {
+      setRoutines(prev => prev.map(r => r.id === id ? { ...routineData, id } : r));
+    } else {
+      setRoutines(prev => [...prev, { ...routineData, id: `RUT-${Date.now()}` }]);
     }
+  };
+
+  const handleDeleteRoutine = (id: string) => {
+    setRoutines(prev => prev.filter(r => r.id !== id));
+  };
+
+  const handleSaveCatalogExercise = (exerciseData: Omit<CatalogExercise, 'id'>, id?: string) => {
+    if (id) {
+      setExerciseCatalog(prev => prev.map(c => c.id === id ? { ...exerciseData, id } : c));
+    } else {
+      setExerciseCatalog(prev => [{ ...exerciseData, id: `CAT-${Date.now()}` }, ...prev]);
+    }
+  };
+
+  const handleDeleteCatalogExercise = (id: string) => {
+    setExerciseCatalog(prev => prev.filter(c => c.id !== id));
   };
 
   // Calculate daily sales for dashboard
@@ -190,6 +237,26 @@ export default function App() {
             onOpenNewMember={() => setIsNewMemberOpen(true)}
           />
         )}
+        {activeTab === 'routines' && (
+          <RoutinesManagement
+            routines={routines}
+            members={members}
+            exerciseCatalog={exerciseCatalog}
+            onAddRoutine={() => { setEditingRoutine(undefined); setIsRoutineModalOpen(true); }}
+            onEditRoutine={(r) => { setEditingRoutine(r); setIsRoutineModalOpen(true); }}
+            onDeleteRoutine={handleDeleteRoutine}
+            onAddCatalogExercise={() => { setEditingCatalogExercise(undefined); setIsExerciseStudioOpen(true); }}
+            onEditCatalogExercise={(ex) => { setEditingCatalogExercise(ex); setIsExerciseStudioOpen(true); }}
+            onDeleteCatalogExercise={handleDeleteCatalogExercise}
+            onOpenPortal={() => setActiveTab('member-portal')}
+          />
+        )}
+        {activeTab === 'member-portal' && (
+          <MemberPortal
+            members={members}
+            routines={routines}
+          />
+        )}
         {activeTab === 'plans' && (
           <PlansManagement 
             plans={plans}
@@ -214,10 +281,26 @@ export default function App() {
       <PosModal products={products} isOpen={isPosOpen} onClose={() => setIsPosOpen(false)} onConfirmSale={handleConfirmSale} />
       <NewMemberModal isOpen={isNewMemberOpen} onClose={() => setIsNewMemberOpen(false)} plans={plans} onCreateMember={handleCreateMember} />
       <WhatsappNotificationModal member={whatsappMember} isOpen={!!whatsappMember} onClose={() => setWhatsappMember(null)} onNotificationSent={() => {}} />
-      <MemberDetailDrawer member={selectedMember} plans={plans} isOpen={!!selectedMember} onClose={() => setSelectedMember(null)} onRenewMembership={handleRenewMembership} onOpenWhatsapp={(m) => setWhatsappMember(m)} />
+      <MemberDetailDrawer
+        member={selectedMember}
+        plans={plans}
+        routines={routines}
+        isOpen={!!selectedMember}
+        onClose={() => setSelectedMember(null)}
+        onRenewMembership={handleRenewMembership}
+        onAssignRoutine={handleAssignRoutine}
+        onOpenWhatsapp={(m) => setWhatsappMember(m)}
+        onOpenPortalForMember={() => {
+          setSelectedMember(null);
+          setActiveTab('member-portal');
+        }}
+      />
       <ProductModal isOpen={isProductModalOpen} onClose={() => setIsProductModalOpen(false)} onSave={handleSaveProduct} product={editingProduct} />
       <PlanModal isOpen={isPlanModalOpen} onClose={() => setIsPlanModalOpen(false)} onSave={handleSavePlan} plan={editingPlan} />
+      <RoutineModal isOpen={isRoutineModalOpen} onClose={() => setIsRoutineModalOpen(false)} onSave={handleSaveRoutine} routine={editingRoutine} exerciseCatalog={exerciseCatalog} />
+      <ExerciseStudioModal isOpen={isExerciseStudioOpen} onClose={() => setIsExerciseStudioOpen(false)} onSave={handleSaveCatalogExercise} initialExercise={editingCatalogExercise} />
 
     </div>
   );
 }
+

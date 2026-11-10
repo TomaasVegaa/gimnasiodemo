@@ -24,6 +24,65 @@ export interface Member {
   attendancesHistory?: string[]; // Array of ISO dates
   planId?: string;
   planName?: string;
+  assignedRoutineId?: string;
+}
+
+export type RoutineGoal = 'HIPERTROFIA' | 'DEFINICION' | 'FUERZA' | 'FUNCIONAL';
+
+export type ExerciseAnimationType =
+  | 'BENCH_PRESS'
+  | 'SQUAT'
+  | 'DEADLIFT'
+  | 'CURL'
+  | 'PULLDOWN'
+  | 'SHOULDER_PRESS'
+  | 'PLANK'
+  | 'CARDIO'
+  | 'LATERAL_RAISE'
+  | 'TRICEP_PUSHDOWN'
+  | 'LEG_PRESS'
+  | 'LUNGE'
+  | 'ROW'
+  | 'CRUNCH';
+
+export type AnimationSpeed = 'SLOW' | 'NORMAL' | 'FAST';
+
+export interface Exercise {
+  id: string;
+  name: string;
+  muscleGroup: string;
+  sets: number;
+  reps: string;
+  restSeconds: number;
+  notes?: string;
+  animationType: ExerciseAnimationType;
+  animationSpeed?: AnimationSpeed;
+  imageUrl?: string;
+  customFrames?: [string, string]; // [Posición A (Inicio), Posición B (Final)] para crear animación A<->B
+}
+
+export interface CatalogExercise {
+  id: string;
+  name: string;
+  muscleGroup: string;
+  defaultSets: number;
+  defaultReps: string;
+  defaultRestSeconds: number;
+  notes?: string;
+  animationType: ExerciseAnimationType;
+  animationSpeed?: AnimationSpeed;
+  imageUrl?: string;
+  customFrames?: [string, string];
+}
+
+export interface Routine {
+  id: string;
+  name: string;
+  goal: RoutineGoal;
+  level: 'PRINCIPIANTE' | 'INTERMEDIO' | 'AVANZADO';
+  daysPerWeek: number;
+  description: string;
+  exercises: Exercise[];
 }
 
 export interface Product {
@@ -64,3 +123,4 @@ export interface MonthlyStats {
   income: number;
   newMembers: number;
 }
+

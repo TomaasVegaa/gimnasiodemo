@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plan, PaymentMethod } from '../types';
-import { X, UserPlus, Check } from 'lucide-react';
+import { X, UserPlus, Check, Fingerprint, RefreshCcw } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface NewMemberModalProps {
@@ -12,7 +12,8 @@ interface NewMemberModalProps {
     email: string,
     phone: string,
     planId: string,
-    paymentMethod: PaymentMethod
+    paymentMethod: PaymentMethod,
+    fingerprintId?: string
   ) => void;
 }
 
@@ -22,6 +23,8 @@ export function NewMemberModal({ isOpen, onClose, plans, onCreateMember }: NewMe
   const [phone, setPhone] = useState('');
   const [planId, setPlanId] = useState<string>(plans[0]?.id || '');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('EFECTIVO');
+  const [fingerprintId, setFingerprintId] = useState<string | undefined>();
+  const [isScanning, setIsScanning] = useState(false);
   const [successNotice, setSuccessNotice] = useState(false);
 
   if (!isOpen) return null;
@@ -30,15 +33,27 @@ export function NewMemberModal({ isOpen, onClose, plans, onCreateMember }: NewMe
     e.preventDefault();
     if (!name || !planId) return;
 
-    onCreateMember(name, email, phone, planId, paymentMethod);
+    onCreateMember(name, email, phone, planId, paymentMethod, fingerprintId);
     setSuccessNotice(true);
     setTimeout(() => {
       setSuccessNotice(false);
       setName('');
       setEmail('');
       setPhone('');
+      setFingerprintId(undefined);
+      setIsScanning(false);
       onClose();
     }, 1500);
+  };
+
+  const simulateFingerprintScan = () => {
+    setIsScanning(true);
+    // Simulate SDK read delay
+    setTimeout(() => {
+      const simulatedId = `FP-${Math.floor(Math.random() * 9000) + 1000}`;
+      setFingerprintId(simulatedId);
+      setIsScanning(false);
+    }, 2000);
   };
 
   const selectedPlan = plans.find(p => p.id === planId);
@@ -61,7 +76,7 @@ export function NewMemberModal({ isOpen, onClose, plans, onCreateMember }: NewMe
           </div>
           <button 
             onClick={onClose} 
-            className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+            className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -123,6 +138,52 @@ export function NewMemberModal({ isOpen, onClose, plans, onCreateMember }: NewMe
 
               <div className="pt-4 border-t border-slate-100">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
+                  Asociar Huella Digital
+                </label>
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={clsx(
+                      "p-2.5 rounded-lg transition-colors",
+                      fingerprintId ? "bg-emerald-100 text-emerald-600" : isScanning ? "bg-blue-100 text-blue-600 animate-pulse" : "bg-slate-200 text-slate-500"
+                    )}>
+                      <Fingerprint className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">
+                        {fingerprintId ? 'Huella Registrada' : isScanning ? 'Apoye el dedo en el lector...' : 'Sin huella asociada'}
+                      </p>
+                      {fingerprintId ? (
+                        <p className="text-xs text-emerald-600 font-bold">ID: {fingerprintId}</p>
+                      ) : (
+                        <p className="text-xs text-slate-500">Agilizará el ingreso por el molinete</p>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={simulateFingerprintScan}
+                    disabled={isScanning}
+                    className={clsx(
+                      "px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 cursor-pointer",
+                      fingerprintId 
+                        ? "bg-slate-200 text-slate-700 hover:bg-slate-300" 
+                        : "bg-slate-900 text-white hover:bg-slate-800",
+                      isScanning && "opacity-50 cursor-not-allowed"
+                    )}
+                  >
+                    {isScanning ? (
+                      <RefreshCcw className="w-4 h-4 animate-spin" />
+                    ) : fingerprintId ? (
+                      'Escanear de nuevo'
+                    ) : (
+                      'Escanear Huella'
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
                   Plan a Contratar *
                 </label>
                 <div className="space-y-2">
@@ -162,7 +223,7 @@ export function NewMemberModal({ isOpen, onClose, plans, onCreateMember }: NewMe
                       type="button"
                       onClick={() => setPaymentMethod(method)}
                       className={clsx(
-                        'flex-1 py-2.5 text-xs font-bold rounded-xl border transition-all',
+                        'flex-1 py-2.5 text-xs font-bold rounded-xl border transition-all cursor-pointer',
                         paymentMethod === method
                           ? 'border-blue-500 bg-blue-50 text-blue-700 ring-1 ring-blue-500'
                           : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
@@ -182,9 +243,9 @@ export function NewMemberModal({ isOpen, onClose, plans, onCreateMember }: NewMe
                 <button
                   type="submit"
                   disabled={!name || !planId}
-                  className="bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2"
+                  className="bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer"
                 >
-                  <Check className="w-4 h-4" /> Registrar Socio y Cobrar
+                  <Check className="w-4 h-4" /> Registrar Socio
                 </button>
               </div>
             </form>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Member, Plan } from '../types';
-import { X, CheckCircle2, RefreshCw, Phone, Mail, Fingerprint, Activity, Clock } from 'lucide-react';
+import { Member, Plan, Routine } from '../types';
+import { X, CheckCircle2, RefreshCw, Phone, Mail, Fingerprint, Activity, Clock, Dumbbell, Smartphone } from 'lucide-react';
 import { clsx } from 'clsx';
 import { format, subDays } from 'date-fns';
 
@@ -8,18 +8,24 @@ interface MemberDetailDrawerProps {
   member: Member | null;
   isOpen: boolean;
   plans: Plan[];
+  routines: Routine[];
   onClose: () => void;
   onRenewMembership: (memberId: string) => void;
+  onAssignRoutine: (memberId: string, routineId: string) => void;
   onOpenWhatsapp: (member: Member) => void;
+  onOpenPortalForMember: () => void;
 }
 
 export function MemberDetailDrawer({
   member,
   isOpen,
   plans,
+  routines,
   onClose,
   onRenewMembership,
+  onAssignRoutine,
   onOpenWhatsapp,
+  onOpenPortalForMember,
 }: MemberDetailDrawerProps) {
   const [renewing, setRenewing] = useState(false);
 
@@ -109,6 +115,36 @@ export function MemberDetailDrawer({
                 {renewing ? 'Renovando...' : 'Renovar Cuota (+30d)'}
               </button>
             </div>
+          </div>
+
+          {/* Assigned Training Routine Card */}
+          <div className="p-4 bg-blue-50/60 rounded-2xl border border-blue-200/80 space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-blue-900 flex items-center gap-1.5">
+                <Dumbbell className="w-4 h-4 text-blue-600" />
+                Rutina de Entrenamiento Asignada
+              </h4>
+              <button
+                type="button"
+                onClick={onOpenPortalForMember}
+                className="text-[11px] font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1 cursor-pointer"
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                Ver en App Socio
+              </button>
+            </div>
+            <select
+              value={member.assignedRoutineId || ''}
+              onChange={(e) => onAssignRoutine(member.id, e.target.value)}
+              className="w-full px-3 py-2 bg-white border border-blue-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            >
+              <option value="">-- Sin rutina asignada --</option>
+              {routines.map(r => (
+                <option key={r.id} value={r.id}>
+                  {r.name} ({r.goal})
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Contact Details */}
