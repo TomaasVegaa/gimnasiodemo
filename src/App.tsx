@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
 import { MembersList } from './components/MembersList';
@@ -20,16 +20,66 @@ import { mockMembers, mockProducts, mockPlans, mockTransactions, mockRoutines, m
 import { Member, Product, Plan, Transaction, PaymentMethod, Routine, CatalogExercise } from './types';
 import { addDays, format } from 'date-fns';
 
+function loadSaved<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  // Reactive State
-  const [members, setMembers] = useState<Member[]>(mockMembers);
-  const [products, setProducts] = useState<Product[]>(mockProducts);
-  const [plans, setPlans] = useState<Plan[]>(mockPlans);
-  const [routines, setRoutines] = useState<Routine[]>(mockRoutines);
-  const [exerciseCatalog, setExerciseCatalog] = useState<CatalogExercise[]>(mockExerciseCatalog);
-  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
+  // Persistent Reactive State (survives page refreshes & code updates)
+  const [members, setMembers] = useState<Member[]>(() => loadSaved('gymflow_members_v1', mockMembers));
+  const [products, setProducts] = useState<Product[]>(() => loadSaved('gymflow_products_v1', mockProducts));
+  const [plans, setPlans] = useState<Plan[]>(() => loadSaved('gymflow_plans_v1', mockPlans));
+  const [routines, setRoutines] = useState<Routine[]>(() => loadSaved('gymflow_routines_v1', mockRoutines));
+  const [exerciseCatalog, setExerciseCatalog] = useState<CatalogExercise[]>(() =>
+    loadSaved('gymflow_catalog_v1', mockExerciseCatalog)
+  );
+  const [transactions, setTransactions] = useState<Transaction[]>(() =>
+    loadSaved('gymflow_transactions_v1', mockTransactions)
+  );
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('gymflow_members_v1', JSON.stringify(members));
+    } catch {}
+  }, [members]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('gymflow_products_v1', JSON.stringify(products));
+    } catch {}
+  }, [products]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('gymflow_plans_v1', JSON.stringify(plans));
+    } catch {}
+  }, [plans]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('gymflow_routines_v1', JSON.stringify(routines));
+    } catch {}
+  }, [routines]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('gymflow_catalog_v1', JSON.stringify(exerciseCatalog));
+    } catch {}
+  }, [exerciseCatalog]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('gymflow_transactions_v1', JSON.stringify(transactions));
+    } catch {}
+  }, [transactions]);
 
   // Modals & Drawers State
   const [isPosOpen, setIsPosOpen] = useState(false);
@@ -191,7 +241,35 @@ export default function App() {
 
   const handleSaveCatalogExercise = (exerciseData: Omit<CatalogExercise, 'id'>, id?: string) => {
     if (id) {
-      setExerciseCatalog(prev => prev.map(c => c.id === id ? { ...exerciseData, id } : c));
+      const previousCat = exerciseCatalog.find(c => c.id === id);
+      setExerciseCatalog(prev => prev.map(c => (c.id === id ? { ...exerciseData, id } : c)));
+
+      // Propagate updated GIF, customFrames, animationType, speed, name, and muscleGroup to all Routines using this exercise!
+      setRoutines(prevRoutines =>
+        prevRoutines.map(routine => ({
+          ...routine,
+          exercises: routine.exercises.map(ex => {
+            const isMatch =
+              ex.catalogExerciseId === id ||
+              (previousCat && ex.name.toLowerCase().trim() === previousCat.name.toLowerCase().trim()) ||
+              ex.name.toLowerCase().trim() === exerciseData.name.toLowerCase().trim();
+
+            if (!isMatch) return ex;
+
+            return {
+              ...ex,
+              catalogExerciseId: id,
+              name: exerciseData.name,
+              muscleGroup: exerciseData.muscleGroup,
+              animationType: exerciseData.animationType,
+              animationSpeed: exerciseData.animationSpeed,
+              imageUrl: exerciseData.imageUrl,
+              customFrames: exerciseData.customFrames,
+              notes: exerciseData.notes || ex.notes,
+            };
+          }),
+        }))
+      );
     } else {
       setExerciseCatalog(prev => [{ ...exerciseData, id: `CAT-${Date.now()}` }, ...prev]);
     }

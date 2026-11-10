@@ -143,6 +143,28 @@ export const mockExerciseCatalog: CatalogExercise[] = [
     animationType: 'CRUNCH',
     animationSpeed: 'NORMAL',
   },
+  {
+    id: 'CAT-13',
+    name: 'Plancha Abdominal Isométrica',
+    muscleGroup: 'Core / Abdomen',
+    defaultSets: 4,
+    defaultReps: '45 seg',
+    defaultRestSeconds: 45,
+    notes: 'Alinear hombros, cadera y tobillos.',
+    animationType: 'PLANK',
+    animationSpeed: 'NORMAL',
+  },
+  {
+    id: 'CAT-14',
+    name: 'Sprints HIIT / Cinta o Bici',
+    muscleGroup: 'Cardio Metabólico',
+    defaultSets: 6,
+    defaultReps: '30s fuerte / 30s suave',
+    defaultRestSeconds: 30,
+    notes: 'Máxima intensidad en los bloques activos.',
+    animationType: 'CARDIO',
+    animationSpeed: 'FAST',
+  },
 ];
 
 export const mockRoutines: Routine[] = [
@@ -156,6 +178,7 @@ export const mockRoutines: Routine[] = [
     exercises: [
       {
         id: 'EX-101',
+        catalogExerciseId: 'CAT-1',
         name: 'Press de Banca Plano con Barra',
         muscleGroup: 'Pectorales',
         sets: 4,
@@ -166,6 +189,7 @@ export const mockRoutines: Routine[] = [
       },
       {
         id: 'EX-102',
+        catalogExerciseId: 'CAT-2',
         name: 'Sentadilla Libre con Barra',
         muscleGroup: 'Piernas / Cuádriceps',
         sets: 4,
@@ -176,6 +200,7 @@ export const mockRoutines: Routine[] = [
       },
       {
         id: 'EX-103',
+        catalogExerciseId: 'CAT-4',
         name: 'Jalón al Pecho en Polea Alta',
         muscleGroup: 'Espalda / Dorsales',
         sets: 4,
@@ -186,6 +211,7 @@ export const mockRoutines: Routine[] = [
       },
       {
         id: 'EX-104',
+        catalogExerciseId: 'CAT-6',
         name: 'Press Militar con Mancuernas',
         muscleGroup: 'Hombros',
         sets: 3,
@@ -196,6 +222,7 @@ export const mockRoutines: Routine[] = [
       },
       {
         id: 'EX-105',
+        catalogExerciseId: 'CAT-8',
         name: 'Curl de Bíceps con Barra EZ',
         muscleGroup: 'Bíceps',
         sets: 3,
@@ -216,17 +243,19 @@ export const mockRoutines: Routine[] = [
     exercises: [
       {
         id: 'EX-201',
-        name: 'Sentadilla Goblet Dinámica',
-        muscleGroup: 'Tren Inferior Completo',
+        catalogExerciseId: 'CAT-2',
+        name: 'Sentadilla Libre con Barra',
+        muscleGroup: 'Piernas / Cuádriceps',
         sets: 4,
         reps: '15',
         restSeconds: 45,
-        notes: 'Ritmo fluido y constante, sosteniendo mancuerna o pesa rusa al pecho.',
+        notes: 'Ritmo fluido y constante.',
         animationType: 'SQUAT',
       },
       {
         id: 'EX-202',
-        name: 'Peso Muerto Rumano con Mancuernas',
+        catalogExerciseId: 'CAT-3',
+        name: 'Peso Muerto Rumano',
         muscleGroup: 'Isquiotibiales / Glúteos',
         sets: 4,
         reps: '12 - 15',
@@ -236,6 +265,7 @@ export const mockRoutines: Routine[] = [
       },
       {
         id: 'EX-203',
+        catalogExerciseId: 'CAT-13',
         name: 'Plancha Abdominal Isométrica',
         muscleGroup: 'Core / Abdomen',
         sets: 4,
@@ -246,10 +276,11 @@ export const mockRoutines: Routine[] = [
       },
       {
         id: 'EX-204',
+        catalogExerciseId: 'CAT-14',
         name: 'Sprints HIIT / Cinta o Bici',
         muscleGroup: 'Cardio Metabólico',
         sets: 6,
-        reps: '30 seg fuerte / 30 suave',
+        reps: '30s fuerte / 30s suave',
         restSeconds: 30,
         notes: 'Máxima intensidad en los bloques de 30 segundos activos.',
         animationType: 'CARDIO',
@@ -266,8 +297,9 @@ export const mockRoutines: Routine[] = [
     exercises: [
       {
         id: 'EX-301',
-        name: 'Peso Muerto Convencional',
-        muscleGroup: 'Cadena Posterior',
+        catalogExerciseId: 'CAT-3',
+        name: 'Peso Muerto Rumano',
+        muscleGroup: 'Isquiotibiales / Glúteos',
         sets: 5,
         reps: '5',
         restSeconds: 150,
@@ -276,8 +308,9 @@ export const mockRoutines: Routine[] = [
       },
       {
         id: 'EX-302',
-        name: 'Press de Banca Pesado',
-        muscleGroup: 'Pectorales / Tríceps',
+        catalogExerciseId: 'CAT-1',
+        name: 'Press de Banca Plano con Barra',
+        muscleGroup: 'Pectorales',
         sets: 5,
         reps: '5',
         restSeconds: 120,
@@ -286,8 +319,9 @@ export const mockRoutines: Routine[] = [
       },
       {
         id: 'EX-303',
-        name: 'Sentadilla Trasera Barra Baja',
-        muscleGroup: 'Piernas / Core',
+        catalogExerciseId: 'CAT-2',
+        name: 'Sentadilla Libre con Barra',
+        muscleGroup: 'Piernas / Cuádriceps',
         sets: 5,
         reps: '5',
         restSeconds: 150,
@@ -306,8 +340,9 @@ export const mockRoutines: Routine[] = [
     exercises: [
       {
         id: 'EX-401',
-        name: 'Sentadilla Libre Controlada',
-        muscleGroup: 'Piernas',
+        catalogExerciseId: 'CAT-2',
+        name: 'Sentadilla Libre con Barra',
+        muscleGroup: 'Piernas / Cuádriceps',
         sets: 3,
         reps: '12',
         restSeconds: 60,
@@ -316,8 +351,9 @@ export const mockRoutines: Routine[] = [
       },
       {
         id: 'EX-402',
-        name: 'Jalón Polea al Pecho',
-        muscleGroup: 'Espalda',
+        catalogExerciseId: 'CAT-4',
+        name: 'Jalón al Pecho en Polea Alta',
+        muscleGroup: 'Espalda / Dorsales',
         sets: 3,
         reps: '12',
         restSeconds: 60,
@@ -326,8 +362,9 @@ export const mockRoutines: Routine[] = [
       },
       {
         id: 'EX-403',
-        name: 'Plancha Frontal Estabilizadora',
-        muscleGroup: 'Core',
+        catalogExerciseId: 'CAT-13',
+        name: 'Plancha Abdominal Isométrica',
+        muscleGroup: 'Core / Abdomen',
         sets: 3,
         reps: '30 seg',
         restSeconds: 45,

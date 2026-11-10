@@ -91,6 +91,7 @@ export function RoutineModal({
       ...prev,
       {
         id: `EX-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        catalogExerciseId: found.id,
         name: found.name,
         muscleGroup: found.muscleGroup,
         sets: found.defaultSets,
@@ -103,6 +104,18 @@ export function RoutineModal({
         customFrames: found.customFrames,
       },
     ]);
+  };
+
+  const handleExerciseGifUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        handleUpdateExercise(index, 'imageUrl', reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleUpdateExercise = (index: number, field: keyof Exercise, value: any) => {
@@ -415,15 +428,36 @@ export function RoutineModal({
 
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-500 mb-1">
-                        Nota Técnica / Tip
+                        GIF / Imagen Propia
                       </label>
-                      <input
-                        type="text"
-                        value={ex.notes || ''}
-                        onChange={e => handleUpdateExercise(idx, 'notes', e.target.value)}
-                        placeholder="Ej. Espalda recta, controlar bajada"
-                        className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs"
-                      />
+                      <div className="flex gap-1.5">
+                        <label className="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold cursor-pointer shrink-0 flex items-center">
+                          Subir GIF
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={e => handleExerciseGifUpload(idx, e)}
+                          />
+                        </label>
+                        <input
+                          type="url"
+                          value={ex.imageUrl || ''}
+                          onChange={e => handleUpdateExercise(idx, 'imageUrl', e.target.value)}
+                          placeholder="o pegar link GIF..."
+                          className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs"
+                        />
+                        {ex.imageUrl && (
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateExercise(idx, 'imageUrl', undefined)}
+                            className="px-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer"
+                            title="Quitar GIF y volver a 2D"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
 

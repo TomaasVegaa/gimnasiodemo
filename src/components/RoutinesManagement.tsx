@@ -8,11 +8,9 @@ import {
   Flame,
   Zap,
   Trophy,
-  Clock,
   Users,
   Smartphone,
   Sparkles,
-  BookOpen,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { ExerciseAnimator } from './ExerciseAnimator';
@@ -35,22 +33,22 @@ const GOAL_META: Record<
   { label: string; badgeClass: string; icon: any }
 > = {
   HIPERTROFIA: {
-    label: 'Subir Masa Muscular',
+    label: 'Masa Muscular',
     badgeClass: 'bg-blue-50 text-blue-700 border-blue-200',
     icon: Dumbbell,
   },
   DEFINICION: {
-    label: 'Definición & Quema',
+    label: 'Definición',
     badgeClass: 'bg-orange-50 text-orange-700 border-orange-200',
     icon: Flame,
   },
   FUERZA: {
-    label: 'Fuerza & Potencia',
+    label: 'Fuerza',
     badgeClass: 'bg-purple-50 text-purple-700 border-purple-200',
     icon: Trophy,
   },
   FUNCIONAL: {
-    label: 'Funcional / Salud',
+    label: 'Funcional',
     badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     icon: Zap,
   },
@@ -77,108 +75,100 @@ export function RoutinesManagement({
       : routines.filter(r => r.goal === selectedGoal);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto animate-in fade-in duration-500">
-      <header className="mb-6 flex flex-col sm:flex-row justify-between sm:items-end gap-4">
-        <div>
-          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-            Rutinas y Estudio de Animaciones
-          </h2>
-          <p className="text-slate-500 mt-1">
-            Armá tus propios ejercicios animados y asignalos en planes según el objetivo del socio.
-          </p>
+    <div className="p-8 max-w-7xl mx-auto animate-in fade-in duration-300">
+      {/* Clean Minimal Header */}
+      <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Rutinas</h2>
+          <div className="flex p-1 bg-slate-200/70 rounded-xl">
+            <button
+              onClick={() => setSubTab('ROUTINES')}
+              className={clsx(
+                'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer',
+                subTab === 'ROUTINES'
+                  ? 'bg-white text-slate-900 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              )}
+            >
+              Planes ({routines.length})
+            </button>
+            <button
+              onClick={() => setSubTab('EXERCISES')}
+              className={clsx(
+                'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer',
+                subTab === 'EXERCISES'
+                  ? 'bg-white text-slate-900 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              )}
+            >
+              Ejercicios ({exerciseCatalog.length})
+            </button>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-3">
+
+        <div className="flex items-center gap-2.5">
           <button
             onClick={onOpenPortal}
-            className="bg-slate-900 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-800 transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
+            className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            <Smartphone className="w-4 h-4 text-blue-400" />
-            Ver App del Socio
+            <Smartphone className="w-4 h-4 text-blue-600" />
+            App Socio
           </button>
           <button
             onClick={onAddCatalogExercise}
-            className="bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-indigo-500 transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
+            className="bg-indigo-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-indigo-500 transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            <Sparkles className="w-4 h-4" /> Crear Ejercicio / Animación
+            <Sparkles className="w-4 h-4" /> + Ejercicio
           </button>
           <button
             onClick={onAddRoutine}
-            className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-500 transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
+            className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-500 transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <Plus className="w-4 h-4" /> Nueva Rutina
           </button>
         </div>
       </header>
 
-      {/* Main Switcher: Routines vs Exercise & Animation Library */}
-      <div className="flex gap-2 p-1.5 bg-slate-200/70 rounded-2xl w-fit mb-8">
-        <button
-          onClick={() => setSubTab('ROUTINES')}
-          className={clsx(
-            'px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer',
-            subTab === 'ROUTINES'
-              ? 'bg-white text-slate-900 shadow-xs'
-              : 'text-slate-600 hover:text-slate-900'
-          )}
-        >
-          <Dumbbell className="w-4 h-4 text-blue-600" />
-          Planes de Rutinas ({routines.length})
-        </button>
-        <button
-          onClick={() => setSubTab('EXERCISES')}
-          className={clsx(
-            'px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer',
-            subTab === 'EXERCISES'
-              ? 'bg-white text-slate-900 shadow-xs'
-              : 'text-slate-600 hover:text-slate-900'
-          )}
-        >
-          <Sparkles className="w-4 h-4 text-indigo-600" />
-          Biblioteca de Ejercicios & Creador de Animaciones ({exerciseCatalog.length})
-        </button>
-      </div>
-
       {subTab === 'ROUTINES' ? (
         <>
-          {/* Filter Bar by Goal */}
-          <div className="flex flex-wrap gap-2 mb-8">
+          {/* Compact Filter Pills */}
+          <div className="flex flex-wrap gap-2 mb-6">
             <button
               onClick={() => setSelectedGoal('ALL')}
               className={clsx(
-                'px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border',
+                'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border',
                 selectedGoal === 'ALL'
-                  ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                  ? 'bg-slate-900 text-white border-slate-900'
                   : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
               )}
             >
-              Todos los Objetivos ({routines.length})
+              Todas
             </button>
             {(['HIPERTROFIA', 'DEFINICION', 'FUERZA', 'FUNCIONAL'] as RoutineGoal[]).map(
               goalKey => {
                 const meta = GOAL_META[goalKey];
                 const Icon = meta.icon;
-                const count = routines.filter(r => r.goal === goalKey).length;
                 return (
                   <button
                     key={goalKey}
                     onClick={() => setSelectedGoal(goalKey)}
                     className={clsx(
-                      'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border',
+                      'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border',
                       selectedGoal === goalKey
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                        ? 'bg-blue-600 text-white border-blue-600'
                         : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                     )}
                   >
                     <Icon className="w-3.5 h-3.5" />
-                    {meta.label} ({count})
+                    {meta.label}
                   </button>
                 );
               }
             )}
           </div>
 
-          {/* Routines Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Clean Routines Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {filteredRoutines.map(routine => {
               const meta = GOAL_META[routine.goal];
               const GoalIcon = meta.icon;
@@ -189,61 +179,56 @@ export function RoutinesManagement({
               return (
                 <div
                   key={routine.id}
-                  className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden"
+                  className="bg-white rounded-2xl border border-slate-200 shadow-2xs flex flex-col overflow-hidden"
                 >
-                  {/* Card Header */}
-                  <div className="p-6 border-b border-slate-100 flex justify-between items-start gap-4">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                  {/* Compact Card Header */}
+                  <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
                         <span
                           className={clsx(
-                            'text-xs font-bold px-2.5 py-1 rounded-full border flex items-center gap-1.5',
+                            'text-[11px] font-bold px-2 py-0.5 rounded-md border flex items-center gap-1',
                             meta.badgeClass
                           )}
                         >
-                          <GoalIcon className="w-3.5 h-3.5" />
+                          <GoalIcon className="w-3 h-3" />
                           {meta.label}
                         </span>
-                        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
-                          Nivel {routine.level}
-                        </span>
-                        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
-                          {routine.daysPerWeek} días/sem
+                        <span className="text-[11px] font-semibold text-slate-400">
+                          {routine.daysPerWeek}d/sem • {routine.level}
                         </span>
                       </div>
-                      <h3 className="text-xl font-bold text-slate-900">{routine.name}</h3>
-                      <p className="text-xs text-slate-500 mt-1">{routine.description}</p>
+                      <h3 className="text-base font-bold text-slate-900 truncate">
+                        {routine.name}
+                      </h3>
                     </div>
 
-                    <div className="flex gap-1 shrink-0">
+                    <div className="flex items-center gap-1 shrink-0">
+                      <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg flex items-center gap-1 mr-1">
+                        <Users className="w-3.5 h-3.5 text-slate-400" />
+                        {assignedCount}
+                      </span>
                       <button
                         onClick={() => onEditRoutine(routine)}
-                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors cursor-pointer"
-                        title="Editar Rutina"
+                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => onDeleteRoutine(routine.id)}
-                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
-                        title="Eliminar Rutina"
+                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
 
-                  {/* Exercises Preview List */}
-                  <div className="p-6 space-y-3 flex-1 bg-slate-50/50">
-                    <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                      <span>Ejercicios ({routine.exercises.length})</span>
-                      <span>Series x Reps</span>
-                    </div>
-
+                  {/* Clean Exercises List */}
+                  <div className="p-4 space-y-2 flex-1 bg-slate-50/40">
                     {routine.exercises.map(ex => (
                       <div
                         key={ex.id}
-                        className="p-3 bg-white rounded-xl border border-slate-200/80 flex items-center gap-3.5 shadow-2xs"
+                        className="p-2.5 bg-white rounded-xl border border-slate-200/70 flex items-center gap-3"
                       >
                         <ExerciseAnimator
                           type={ex.animationType}
@@ -253,38 +238,16 @@ export function RoutinesManagement({
                           size="sm"
                         />
                         <div className="flex-1 min-w-0">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
-                            {ex.muscleGroup}
-                          </span>
                           <p className="text-sm font-bold text-slate-900 truncate">{ex.name}</p>
-                          {ex.notes && (
-                            <p className="text-xs text-slate-500 truncate mt-0.5">{ex.notes}</p>
-                          )}
-                        </div>
-                        <div className="text-right shrink-0">
-                          <span className="inline-block bg-slate-900 text-white text-xs font-bold px-2.5 py-1 rounded-lg">
-                            {ex.sets} x {ex.reps}
+                          <span className="text-[11px] font-medium text-slate-400">
+                            {ex.muscleGroup} • {ex.restSeconds}s descanso
                           </span>
-                          <p className="text-[11px] text-slate-400 mt-1 flex items-center justify-end gap-1">
-                            <Clock className="w-3 h-3" /> {ex.restSeconds}s
-                          </p>
                         </div>
+                        <span className="bg-slate-900 text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0">
+                          {ex.sets} × {ex.reps}
+                        </span>
                       </div>
                     ))}
-                  </div>
-
-                  {/* Card Footer */}
-                  <div className="px-6 py-3.5 bg-white border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span className="flex items-center gap-1.5 font-medium">
-                      <Users className="w-4 h-4 text-blue-600" />
-                      {assignedCount} {assignedCount === 1 ? 'socio asignado' : 'socios asignados'}
-                    </span>
-                    <button
-                      onClick={() => onEditRoutine(routine)}
-                      className="text-blue-600 hover:text-blue-700 font-bold cursor-pointer"
-                    >
-                      Configurar ejercicios →
-                    </button>
                   </div>
                 </div>
               );
@@ -292,99 +255,47 @@ export function RoutinesManagement({
           </div>
         </>
       ) : (
-        /* SUBTAB 2: EXERCISE & ANIMATION CATALOG */
-        <div className="space-y-6">
-          <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-slate-900 text-white p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5" />
-                Catálogo Reutilizable del Gimnasio
-              </span>
-              <h3 className="text-xl font-bold">
-                Creá tus propios Ejercicios con Animación 2D, GIF o Doble Foto
-              </h3>
-              <p className="text-xs text-slate-300 max-w-2xl">
-                Todo ejercicio que guardes acá queda disponible para insertarlo con 1 clic dentro de cualquier rutina. Podés elegir entre las 14 figuras biomecánicas, ajustar su velocidad o subir 2 fotos para que el sistema las anime solas.
-              </p>
-            </div>
-            <button
-              onClick={onAddCatalogExercise}
-              className="bg-indigo-500 hover:bg-indigo-400 text-white px-5 py-3 rounded-xl text-xs font-bold flex items-center gap-2 shrink-0 cursor-pointer shadow-md"
+        /* SUBTAB 2: CLEAN EXERCISE & ANIMATION GRID */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {exerciseCatalog.map(item => (
+            <div
+              key={item.id}
+              onClick={() => onEditCatalogExercise(item)}
+              className="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs flex items-center gap-4 hover:border-blue-400 transition-all cursor-pointer group"
             >
-              <Sparkles className="w-4 h-4" /> + Crear Nuevo Ejercicio Animado
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {exerciseCatalog.map(item => (
-              <div
-                key={item.id}
-                className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs flex flex-col justify-between gap-4 hover:border-slate-300 transition-all"
-              >
-                <div className="flex items-start gap-4">
-                  <ExerciseAnimator
-                    type={item.animationType}
-                    speed={item.animationSpeed}
-                    imageUrl={item.imageUrl}
-                    customFrames={item.customFrames}
-                    size="md"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
-                        {item.muscleGroup}
-                      </span>
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => onEditCatalogExercise(item)}
-                          className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
-                          title="Editar animación y datos"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => onDeleteCatalogExercise(item.id)}
-                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                          title="Eliminar de biblioteca"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <h4 className="text-base font-bold text-slate-900 mt-1.5 leading-snug">
-                      {item.name}
-                    </h4>
-                    <p className="text-xs font-semibold text-slate-600 mt-1">
-                      Sugerido: {item.defaultSets} series x {item.defaultReps} ({item.defaultRestSeconds}s)
-                    </p>
-                    {item.notes && (
-                      <p className="text-xs text-slate-400 mt-1 line-clamp-2">{item.notes}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-                  <span>
-                    Cadencia:{' '}
-                    <strong className="text-slate-700">
-                      {item.animationSpeed === 'SLOW'
-                        ? 'Controlada'
-                        : item.animationSpeed === 'FAST'
-                        ? 'Explosiva'
-                        : 'Normal'}
-                    </strong>
-                  </span>
+              <ExerciseAnimator
+                type={item.animationType}
+                speed={item.animationSpeed}
+                imageUrl={item.imageUrl}
+                customFrames={item.customFrames}
+                size="md"
+              />
+              <div className="flex-1 min-w-0">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600">
+                  {item.muscleGroup}
+                </span>
+                <h4 className="text-sm font-bold text-slate-900 truncate mt-0.5">
+                  {item.name}
+                </h4>
+                <p className="text-xs font-semibold text-slate-400 mt-1">
+                  {item.defaultSets} × {item.defaultReps}
+                </p>
+                <div className="mt-2 flex items-center gap-1 opacity-80 group-hover:opacity-100">
+                  <span className="text-[11px] font-bold text-blue-600">Editar</span>
                   <button
-                    onClick={() => onEditCatalogExercise(item)}
-                    className="text-indigo-600 font-bold hover:underline cursor-pointer"
+                    type="button"
+                    onClick={e => {
+                      e.stopPropagation();
+                      onDeleteCatalogExercise(item.id);
+                    }}
+                    className="ml-auto p-1 text-slate-300 hover:text-rose-600 rounded transition-colors cursor-pointer"
                   >
-                    Personalizar Animación →
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

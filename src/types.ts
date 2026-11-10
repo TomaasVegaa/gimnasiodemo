@@ -49,6 +49,7 @@ export type AnimationSpeed = 'SLOW' | 'NORMAL' | 'FAST';
 
 export interface Exercise {
   id: string;
+  catalogExerciseId?: string;
   name: string;
   muscleGroup: string;
   sets: number;
